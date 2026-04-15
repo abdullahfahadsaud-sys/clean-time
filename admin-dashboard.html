@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clean Time – لوحة الأدمن</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="/static/css/admin-dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img class="logo-image" src="/static/logo.jpg" alt="Clean Time Logo">
+      <div class="logo-tag">لوحة الإدارة</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">👑</div>
+      <div><div class="user-name" id="sideUserName">—</div><div class="user-role">مدير النظام</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">الإدارة</div>
+      <a class="nav-item active" data-page="dashboard" href="#">
+        <span class="nav-icon">📊</span> لوحة التحكم
+      </a>
+      <a class="nav-item" data-page="teams" href="#">
+        <span class="nav-icon">👷</span> الفرق
+      </a>
+      <a class="nav-item" data-page="orders" href="#">
+        <span class="nav-icon">📋</span> جميع العمليات
+      </a>
+      <a class="nav-item" data-page="invoices" href="#">
+        <span class="nav-icon">🧾</span> الفواتير
+      </a>
+      <a class="nav-item" data-page="expenses" href="#">
+        <span class="nav-icon">💸</span> المصروفات
+      </a>
+      <a class="nav-item" data-page="reports" href="#">
+        <span class="nav-icon">📈</span> التقارير
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" type="button" data-action="logout">🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburgerBtn" type="button"><span></span><span></span><span></span></button>
+        <div class="topbar-title" id="pageTitle">لوحة التحكم</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topDate"></div>
+        <button class="btn btn-ghost btn-sm" id="refreshBtn" type="button">🔄</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Dashboard -->
+      <div class="page-section active" id="page-dashboard">
+        <div class="period-tabs">
+          <button class="period-tab active" type="button" data-dash-period="today">اليوم</button>
+          <button class="period-tab" type="button" data-dash-period="month">هذا الشهر</button>
+        </div>
+        <div class="stat-grid" id="dashStats"></div>
+        <div class="card">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">📋 آخر 10 عمليات</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>الفاتورة</th><th>الفريق</th><th>الخدمة</th><th>الكمية</th><th>الإجمالي</th><th>الدفع</th><th>التاريخ</th></tr></thead>
+              <tbody id="dashRecentBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- الفرق -->
+      <div class="page-section" id="page-teams">
+        <div class="period-tabs">
+          <button class="period-tab active" type="button" data-team-period="today">اليوم</button>
+          <button class="period-tab" type="button" data-team-period="month">هذا الشهر</button>
+        </div>
+        <div id="teamsContent"></div>
+      </div>
+
+      <!-- العمليات -->
+      <div class="page-section" id="page-orders">
+        <div class="filter-bar">
+          <select id="filterTeam">
+            <option value="">جميع الفرق</option>
+            <option value="team1">الفريق الأول</option>
+            <option value="team2">الفريق الثاني</option>
+            <option value="team3">الفريق الثالث</option>
+            <option value="team4">الفريق الرابع</option>
+            <option value="team5">الفريق الخامس</option>
+          </select>
+          <select id="filterService">
+            <option value="">جميع الخدمات</option>
+          </select>
+          <select id="filterPayment">
+            <option value="">جميع طرق الدفع</option>
+            <option value="كاش">كاش</option>
+            <option value="شبكة">شبكة</option>
+            <option value="تحويل">تحويل</option>
+            <option value="مختلط">مختلط</option>
+          </select>
+          <span class="filter-label">من:</span>
+          <input type="date" id="filterDateFrom">
+          <span class="filter-label">إلى:</span>
+          <input type="date" id="filterDateTo">
+          <button class="btn btn-ghost btn-sm" id="clearOrdersFilterBtn" type="button">✕ مسح</button>
+          <button class="btn btn-teal btn-sm" id="exportOrdersBtn" type="button">📥 CSV</button>
+        </div>
+        <div class="card">
+          <div class="section-head">
+            <h3 style="font-size:15px;font-weight:700;">جميع العمليات</h3>
+            <span id="ordersCount" style="font-size:12px;color:var(--text-muted);"></span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr>
+                <th>الفاتورة</th><th>الفريق</th><th>الخدمة</th>
+                <th>الكمية</th><th>الخصم</th><th>الإجمالي</th>
+                <th>الدفع</th><th>العميل</th><th>التاريخ</th><th>إجراء</th>
+              </tr></thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- الفواتير -->
+      <div class="page-section" id="page-invoices">
+        <div class="filter-bar">
+          <select id="filterInvTeam">
+            <option value="">جميع الفرق</option>
+          </select>
+          <input type="text" id="searchInv" placeholder="🔍 بحث برقم الفاتورة أو الجوال..." style="flex:1;min-width:180px;">
+          <span class="filter-label">من:</span>
+          <input type="date" id="filterInvDateFrom">
+          <span class="filter-label">إلى:</span>
+          <input type="date" id="filterInvDateTo">
+          <button class="btn btn-ghost btn-sm" id="clearInvoicesFilterBtn" type="button">✕ مسح</button>
+          <button class="btn btn-teal btn-sm" id="exportInvoicesBtn" type="button">📥 CSV</button>
+        </div>
+        <div class="scope-bar" id="invoiceScopeBar">
+          <div>
+            <div class="scope-bar-text" id="invoiceScopeText"></div>
+            <div class="scope-bar-sub" id="invoiceScopeSub"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="invoiceScopeClearBtn" type="button">عرض كل الفواتير</button>
+        </div>
+        <div id="invoicesContent"></div>
+      </div>
+
+      <!-- المصروفات -->
+      <div class="page-section" id="page-expenses">
+        <div class="card">
+          <div class="section-head">
+            <h3 style="font-size:16px;font-weight:700;">💸 المصروفات</h3>
+            <span style="font-size:12px;color:var(--text-muted);">أضف مصروفات عامة أو خاصة حسب الفريق</span>
+          </div>
+
+          <div class="expense-summary">
+            <div class="expense-pill">
+              <div class="k">إجمالي المصروفات العامة</div>
+              <div class="v" id="expensesGeneralTotal">0 ريال</div>
+            </div>
+            <div class="expense-pill">
+              <div class="k">إجمالي المصروفات الخاصة</div>
+              <div class="v" id="expensesPrivateTotal">0 ريال</div>
+            </div>
+            <div class="expense-pill">
+              <div class="k">إجمالي المصروفات الكلي</div>
+              <div class="v" id="expensesTotal">0 ريال</div>
+            </div>
+          </div>
+
+          <div class="expense-form-grid">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">نوع المصروف</label>
+              <select class="form-control" id="expenseType">
+                <option value="general">مصروفات عامة</option>
+                <option value="private">مصروفات خاصة</option>
+              </select>
+            </div>
+            <div class="form-group" id="expenseTeamWrap" style="margin-bottom:0;display:none;">
+              <label class="form-label">اختر الفريق</label>
+              <select class="form-control" id="expenseTeam"></select>
+            </div>
+          </div>
+
+          <div class="expense-form-grid" style="margin-top:12px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">وصف المصروف</label>
+              <input class="form-control" id="expenseTitle" type="text" placeholder="مثال: كرتونين صابون">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">السعر (ريال)</label>
+              <input class="form-control" id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="400">
+            </div>
+            <button class="btn btn-primary" id="addExpenseBtn" type="button" style="height:46px;">➕ إضافة</button>
+          </div>
+
+          <div id="expenseAlert" style="margin-top:14px;"></div>
+
+          <div class="section-head" style="margin:20px 0 14px;">
+            <h4 style="font-size:14px;font-weight:700;">سجل المصروفات</h4>
+            <span id="expensesCount" style="font-size:12px;color:var(--text-muted);"></span>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>النوع</th>
+                  <th>الفريق</th>
+                  <th>الوصف</th>
+                  <th>المبلغ</th>
+                  <th>أضيف بواسطة</th>
+                  <th>التاريخ</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody id="expensesBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- التقارير -->
+      <div class="page-section" id="page-reports">
+        <div class="stat-grid" id="reportStats"></div>
+        <div class="reports-grid">
+          <div class="card">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">💵 توزيع طرق الدفع</h3>
+            <div class="chart-wrap"><canvas id="paymentChart"></canvas></div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">🧹 أكثر الخدمات</h3>
+            <div class="chart-wrap"><canvas id="servicesChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">📅 الدخل اليومي (هذا الشهر)</h3>
+          <div class="chart-wrap-lg"><canvas id="dailyChart"></canvas></div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">🏆 ترتيب الفرق (إجمالي)</h3>
+          <div id="teamsRanking"></div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">💸 المصروفات الخاصة حسب الفريق</h3>
+          <div id="teamExpensesRanking"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal تعديل -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ تعديل الفاتورة</div>
+      <button class="modal-close" id="closeEditModalBtn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editOrderId">
+      <div id="editItemsNotice" class="alert alert-warning" style="display:none;margin-bottom:14px;"></div>
+      <div class="form-two-grid">
+        <div class="form-group">
+          <label class="form-label">الخدمة</label>
+          <select class="form-control" id="editService"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الكمية</label>
+          <input class="form-control" id="editQty" type="number" min="0.1" step="0.1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">سعر الوحدة (ريال)</label>
+          <input class="form-control" id="editUnitPrice" type="number" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">الخصم (ريال)</label>
+          <input class="form-control" id="editDiscount" type="number" min="0" value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">جوال العميل</label>
+          <input class="form-control" id="editPhone" type="tel" maxlength="10">
+        </div>
+        <div class="form-group">
+          <label class="form-label">طريقة الدفع</label>
+          <select class="form-control" id="editPayment">
+            <option value="كاش">كاش</option>
+            <option value="شبكة">شبكة</option>
+            <option value="تحويل">تحويل</option>
+            <option value="مختلط">مختلط</option>
+          </select>
+        </div>
+      </div>
+      <div id="editMixedWrap" style="display:none;" class="form-group">
+        <label class="form-label">مبلغ الكاش (ريال)</label>
+        <input class="form-control" id="editCashAmount" type="number" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ملاحظات الفريق</label>
+        <textarea class="form-control" id="editNotes" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ملاحظة الأدمن</label>
+        <textarea class="form-control" id="editAdminNote" rows="2" placeholder="أضف ملاحظة إدارية..."></textarea>
+      </div>
+      <div class="info-summary-box">
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;">
+          <span>الإجمالي الجديد:</span>
+          <span style="color:var(--orange)" id="editTotal">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelEditBtn" type="button">إلغاء</button>
+      <button class="btn btn-primary" id="saveEditBtn" type="button">💾 حفظ التعديل</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script src="/static/js/admin/core.js"></script>
+<script src="/static/js/admin/dashboard.js"></script>
+<script src="/static/js/admin/expenses.js"></script>
+<script src="/static/js/admin/orders.js"></script>
+<script src="/static/js/admin/reports.js"></script>
+<script src="/static/js/admin/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
+clean_time.db
+*.db-wal
+*.db-shm

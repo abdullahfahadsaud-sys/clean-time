@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clean Time – لوحة الفريق</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="/static/css/team-dashboard.css?v=20260415-team-icons">
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img class="logo-image" src="/static/logo.jpg" alt="Clean Time Logo">
+      <div class="logo-tag">بوابة الفريق</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">👷</div>
+      <div><div class="user-name" id="sideUserName">—</div><div class="user-role">فريق العمل</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">القائمة</div>
+      <a class="nav-item active" data-page="new-order" href="#">
+        <span class="nav-icon">➕</span> عملية جديدة
+      </a>
+      <a class="nav-item" data-page="my-invoices" href="#">
+        <span class="nav-icon">📄</span> فواتيري
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" type="button" data-action="logout">🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburgerBtn" type="button"><span></span><span></span><span></span></button>
+        <div class="topbar-title" id="pageTitle">عملية جديدة</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topDate"></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== صفحة عملية جديدة ===== -->
+      <div class="page-section active" id="page-new-order">
+        <div class="card" style="max-width:680px;margin:0 auto;">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">🧾 إنشاء فاتورة متعددة الخدمات</h3>
+
+          <!-- اختيار الخدمة -->
+          <div class="form-group">
+            <label class="form-label">نوع الخدمة</label>
+            <div class="service-grid" id="serviceGrid"></div>
+            <input type="hidden" id="selectedService">
+          </div>
+
+          <div class="form-group is-hidden" id="priceOptionGroup">
+            <label class="form-label" id="priceOptionLabel">اختر السعر المناسب</label>
+            <div class="payment-tabs price-tabs" id="priceOptionTabs"></div>
+            <input type="hidden" id="priceOption" value="0">
+          </div>
+
+          <!-- الكمية والسعر -->
+          <div class="form-two-grid">
+            <div class="form-group" id="quantityGroup">
+              <label class="form-label" id="quantityLabel">الكمية <span id="unitLabel" style="color:var(--text-muted)">(وحدة)</span></label>
+              <input class="form-control" id="quantity" type="number" min="1" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" id="unitPriceLabel">سعر الوحدة (ريال)</label>
+              <input class="form-control" id="unitPrice" type="number" min="0" placeholder="0">
+            </div>
+          </div>
+
+          <!-- الخصم -->
+          <div class="form-group">
+            <label class="form-label">الخصم (ريال) — اختياري</label>
+            <input class="form-control" id="discount" type="number" min="0" value="0" placeholder="0">
+          </div>
+
+          <!-- جوال العميل -->
+          <div class="form-group">
+            <label class="form-label">رقم جوال العميل</label>
+            <input class="form-control" id="phone" type="tel" placeholder="05xxxxxxxx" maxlength="10">
+          </div>
+
+          <!-- طريقة الدفع -->
+          <div class="form-group">
+            <label class="form-label">طريقة الدفع</label>
+            <div class="payment-tabs">
+              <button class="pay-tab active" type="button" data-payment="كاش">💵 كاش</button>
+              <button class="pay-tab" type="button" data-payment="شبكة">💳 شبكة</button>
+              <button class="pay-tab" type="button" data-payment="تحويل">🏦 تحويل</button>
+              <button class="pay-tab" type="button" data-payment="مختلط">🔀 مختلط</button>
+            </div>
+            <input type="hidden" id="paymentMethod" value="كاش">
+          </div>
+
+          <!-- حقول الدفع المختلط -->
+          <div class="mixed-fields" id="mixedFields">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">مبلغ الكاش (ريال)</label>
+              <input class="form-control" id="cashAmount" type="number" min="0" placeholder="0">
+            </div>
+            <div class="form-group" style="flex:1">
+              <label class="form-label">الباقي (شبكة/تحويل)</label>
+              <input class="form-control" id="networkAmount" type="number" readonly placeholder="0" style="opacity:.7">
+            </div>
+          </div>
+
+          <!-- ملخص السعر -->
+          <div class="price-summary" id="priceSummary" style="display:none">
+            <div class="section-caption">ملخص البند الحالي</div>
+            <div class="ps-row"><span id="psSubLabel">الكمية × سعر الوحدة</span><span id="ps-sub">—</span></div>
+            <div class="ps-row discount" id="ps-disc-row" style="display:none"><span>الخصم</span><span id="ps-disc">—</span></div>
+            <div class="ps-row total"><span>💰 الإجمالي</span><span id="ps-total">—</span></div>
+          </div>
+
+          <div class="draft-actions">
+            <button class="btn btn-teal" id="addItemBtn" type="button">➕ إضافة البند للفواتير</button>
+            <button class="btn btn-ghost" id="cancelItemEditBtn" type="button" style="display:none;">إلغاء تعديل البند</button>
+          </div>
+
+          <div class="draft-list">
+            <div class="draft-head">
+              <h4 style="font-size:14px;font-weight:700;">بنود الفاتورة</h4>
+              <span id="draftItemsCount" style="font-size:12px;color:var(--text-muted);"></span>
+            </div>
+            <div id="draftItemsList" class="draft-empty">أضف بندًا واحدًا على الأقل قبل إصدار الفاتورة</div>
+          </div>
+
+          <div class="price-summary" id="invoiceSummary" style="display:none">
+            <div class="section-caption">ملخص الفاتورة</div>
+            <div class="ps-row"><span>الإجمالي قبل الخصم</span><span id="inv-sub">—</span></div>
+            <div class="ps-row discount" id="inv-disc-row" style="display:none"><span>إجمالي الخصومات</span><span id="inv-disc">—</span></div>
+            <div class="ps-row total"><span>🧾 الإجمالي النهائي</span><span id="inv-total">—</span></div>
+          </div>
+
+          <!-- ملاحظات -->
+          <div class="form-group" style="margin-top:16px">
+            <label class="form-label">ملاحظات — اختياري</label>
+            <textarea class="form-control" id="notes" rows="2" placeholder="أي ملاحظات إضافية..."></textarea>
+          </div>
+
+          <div id="formAlert"></div>
+
+          <div class="form-actions-row">
+            <button class="btn btn-primary" id="submitOrderBtn" type="button" style="flex:1;justify-content:center;">
+              🧾 إصدار الفاتورة
+            </button>
+            <button class="btn btn-ghost" id="resetFormBtn" type="button">↺ مسح</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== صفحة فواتيري ===== -->
+      <div class="page-section" id="page-my-invoices">
+        <div class="section-head">
+          <h3 style="font-size:16px;font-weight:700;">📄 فواتيري</h3>
+          <span id="invCount" style="font-size:12px;color:var(--text-muted);"></span>
+        </div>
+        <div id="invoicesList"></div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- ===== Modal الفاتورة ===== -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">✅ تم إصدار الفاتورة</div>
+      <button class="modal-close" id="modalCloseBtn" type="button">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:32px 24px;">
+      <div style="font-size:52px;margin-bottom:12px;">🧾</div>
+      <div style="font-size:22px;font-weight:900;color:var(--teal);margin-bottom:6px;" id="modalInvNum"></div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;" id="modalInvTotal"></div>
+      <div style="font-size:13px;color:var(--orange);margin-bottom:20px;display:none;" id="modalInvDiscount"></div>
+      <div class="modal-actions-center">
+        <button class="btn btn-primary" id="modalPrintBtn" type="button">🖨️ طباعة الفاتورة</button>
+        <button class="btn btn-ghost" id="modalDismissBtn" type="button">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js?v=20260415-team-icons"></script>
+<script src="/static/js/team/core.js?v=20260415-team-icons"></script>
+<script src="/static/js/team/invoice-builder.js?v=20260415-team-icons"></script>
+<script src="/static/js/team/invoices.js?v=20260415-team-icons"></script>
+<script src="/static/js/team/index.js?v=20260415-team-icons"></script>
+</body>
+</html>
