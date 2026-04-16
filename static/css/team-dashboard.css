@@ -1,4 +1,4 @@
-.service-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:6px;}
+.service-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:6px;max-width:100%;}
 .svc-card{background:rgba(255,255,255,.05);border:2px solid rgba(74,184,193,.15);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;}
 .svc-card:hover,.svc-card.selected{background:rgba(74,184,193,.12);border-color:var(--teal);}
 .svc-card.selected{box-shadow:0 0 0 3px rgba(74,184,193,.2);}
@@ -9,13 +9,14 @@
 .svc-price{font-size:11px;color:var(--teal);margin-top:2px;}
 .is-hidden{display:none !important;}
 
-.payment-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.payment-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;max-width:100%;}
 .pay-tab{padding:8px 16px;border-radius:8px;border:1.5px solid rgba(74,184,193,.2);background:transparent;color:rgba(255,255,255,.6);font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
 .pay-tab:hover,.pay-tab.active{background:rgba(74,184,193,.1);border-color:var(--teal);color:var(--teal);}
-.price-tabs .pay-tab{min-width:110px;justify-content:center;display:inline-flex;align-items:center;}
+.price-tabs .pay-tab{min-width:110px;justify-content:center;display:inline-flex;align-items:center;max-width:100%;}
 
-.mixed-fields{display:none;gap:12px;}
+.mixed-fields{display:none;gap:12px;flex-wrap:wrap;max-width:100%;}
 .mixed-fields.show{display:flex;}
+.mixed-fields > *{min-width:0;}
 
 .price-summary{background:rgba(74,184,193,.06);border:1px solid rgba(74,184,193,.15);border-radius:12px;padding:16px;margin-top:16px;}
 .ps-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;}
@@ -25,20 +26,20 @@
 .draft-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
 .draft-list{margin-top:18px;}
 .draft-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
-.draft-item-card{background:rgba(255,255,255,.04);border:1px solid rgba(74,184,193,.14);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px;}
-.draft-item-main{flex:1;min-width:180px;}
-.draft-item-title{font-size:14px;font-weight:800;color:var(--white);}
-.draft-item-meta{font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.8;}
-.draft-item-side{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
+.draft-item-card{background:rgba(255,255,255,.04);border:1px solid rgba(74,184,193,.14);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px;max-width:100%;}
+.draft-item-main{flex:1;min-width:0;}
+.draft-item-title{font-size:14px;font-weight:800;color:var(--white);overflow-wrap:anywhere;}
+.draft-item-meta{font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.8;overflow-wrap:anywhere;}
+.draft-item-side{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;min-width:0;}
 .draft-item-total{font-size:16px;font-weight:900;color:var(--orange);}
 .draft-item-btns{display:flex;gap:8px;flex-wrap:wrap;}
 .draft-empty{padding:18px 16px;border:1px dashed rgba(74,184,193,.18);border-radius:12px;color:var(--text-muted);text-align:center;}
 
-.invoice-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;}
+.invoice-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;max-width:100%;min-width:0;}
 .inv-num-badge{background:linear-gradient(135deg,var(--teal),var(--teal2));border-radius:10px;padding:10px 14px;font-size:12px;font-weight:900;white-space:nowrap;}
-.inv-info{flex:1;}
-.inv-service{font-size:14px;font-weight:700;}
-.inv-meta{font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.8;}
+.inv-info{flex:1;min-width:0;}
+.inv-service{font-size:14px;font-weight:700;overflow-wrap:anywhere;}
+.inv-meta{font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.8;overflow-wrap:anywhere;}
 .inv-price{font-size:16px;font-weight:900;color:var(--orange);white-space:nowrap;}
 .inv-side{text-align:left;display:flex;flex-direction:column;align-items:flex-start;}
 

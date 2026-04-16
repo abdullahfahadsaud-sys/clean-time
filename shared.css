@@ -25,6 +25,9 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -32,16 +35,32 @@ body {
   background: var(--navy);
   color: var(--white);
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
   direction: rtl;
   overflow-x: hidden;
+  position: relative;
 }
 
 img {
   max-width: 100%;
 }
 
+svg,
+canvas,
+video,
+iframe {
+  max-width: 100%;
+}
+
 /* ===== Layout ===== */
-.layout { display: flex; min-height: 100vh; }
+.layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
 
 /* ===== Sidebar ===== */
 .sidebar {
@@ -191,6 +210,10 @@ img {
 .topbar-date  { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
 
 .content { padding: 28px; flex: 1; min-width: 0; }
+.content > * {
+  min-width: 0;
+  max-width: 100%;
+}
 
 /* ===== Cards ===== */
 .card {
@@ -200,6 +223,7 @@ img {
   border-radius: 16px;
   padding: 24px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .stat-grid {
@@ -227,6 +251,7 @@ img {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 14px;
+  max-width: 100%;
 }
 table { width: 100%; border-collapse: collapse; min-width: 100%; }
 thead th {
@@ -273,6 +298,7 @@ tbody td { padding: 13px 16px; font-size: 13px; color: rgba(255,255,255,0.85); }
   cursor: pointer;
   border: none;
   transition: all 0.2s;
+  max-width: 100%;
 }
 .btn-primary {
   background: linear-gradient(135deg, var(--orange), var(--orange2));
@@ -297,6 +323,7 @@ tbody td { padding: 13px 16px; font-size: 13px; color: rgba(255,255,255,0.85); }
 .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 8px; }
 .form-control {
   width: 100%;
+  max-width: 100%;
   background: rgba(255,255,255,0.06);
   border: 1.5px solid rgba(74,184,193,0.2);
   border-radius: 10px;
@@ -382,6 +409,16 @@ select.form-control { cursor: pointer; }
 /* ===== Page sections ===== */
 .page-section { display: none; }
 .page-section.active { display: block; }
+
+.page-section,
+.section-head,
+.form-two-grid,
+.form-actions-row,
+.modal-actions-center,
+.info-summary-box {
+  min-width: 0;
+  max-width: 100%;
+}
 
 .section-head {
   display: flex;
@@ -529,6 +566,12 @@ select.form-control { cursor: pointer; }
 }
 
 @media (max-width: 560px) {
+  .content {
+    padding: 14px;
+  }
+  .card {
+    padding: 16px;
+  }
   .sidebar-logo {
     padding: 20px 16px;
   }

@@ -32,6 +32,9 @@
       font-family: "Segoe UI", Tahoma, Arial, sans-serif;
       color: var(--text);
       min-height: 100%;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
     }
 
     body {
@@ -39,6 +42,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
+      overflow-x: hidden;
     }
 
     .print-btn {
@@ -65,6 +69,7 @@
 
     .page {
       width: 210mm;
+      max-width: 100%;
       min-height: 297mm;
       background: #fff;
       box-shadow: var(--shadow);
@@ -92,6 +97,7 @@
       padding-bottom: 14px;
       border-bottom: 2px solid var(--soft-2);
       margin-bottom: 16px;
+      min-width: 0;
     }
 
     .date-card {
@@ -149,6 +155,7 @@
     .logo-area {
       text-align: center;
       min-width: 220px;
+      max-width: 100%;
     }
 
     .logo-box {
@@ -199,6 +206,7 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
       margin-bottom: 14px;
+      min-width: 0;
     }
 
     .meta-card {
@@ -234,6 +242,7 @@
       grid-template-columns: 1.3fr 1fr 1fr;
       gap: 10px;
       margin-bottom: 14px;
+      min-width: 0;
     }
 
     .field-card {
@@ -266,14 +275,18 @@
     .table-shell {
       border: 1px solid var(--line);
       border-radius: 18px;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
       margin-bottom: 14px;
+      max-width: 100%;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
+      min-width: 680px;
     }
 
     thead tr {
@@ -342,6 +355,7 @@
       gap: 12px;
       margin-bottom: 14px;
       direction: ltr;
+      min-width: 0;
     }
 
     .signature-card,
@@ -365,10 +379,11 @@
       align-items: center;
       justify-content: center;
       min-height: 290px;
+      min-width: 0;
     }
 
     .signature-card img {
-      width: 700px;
+      width: 100%;
       max-width: 100%;
       max-height: 360px;
       object-fit: contain;
@@ -400,6 +415,7 @@
 
     .total-row input {
       width: 130px;
+      max-width: 100%;
       border: none;
       outline: none;
       background: transparent;
@@ -430,6 +446,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+      min-width: 0;
     }
 
     .footer-box {
@@ -459,6 +476,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
+      min-width: 0;
     }
 
     .signature {
@@ -520,6 +538,21 @@
     }
 
     @media (max-width: 860px) {
+      body {
+        padding: 12px;
+      }
+
+      .print-btn {
+        position: static;
+        width: 100%;
+        margin-bottom: 12px;
+      }
+
+      .page {
+        border-radius: 18px;
+        padding: 18px 14px 16px;
+      }
+
       .header,
       .meta-grid,
       .customer-bar,
@@ -529,8 +562,78 @@
         grid-template-columns: 1fr;
       }
 
+      .header {
+        gap: 12px;
+      }
+
       .logo-area {
         min-width: unset;
+      }
+
+      .title-section h1 {
+        font-size: 24px;
+      }
+
+      .signature-card {
+        min-height: 180px;
+      }
+
+      .signature-card img {
+        max-height: 220px;
+      }
+
+      .total-row input {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 10px;
+      }
+
+      .page {
+        padding: 16px 12px 14px;
+        border-radius: 16px;
+      }
+
+      .date-card,
+      .meta-card,
+      .field-card,
+      .signature-card,
+      .totals-card,
+      .footer-box {
+        padding: 10px;
+        border-radius: 12px;
+      }
+
+      .date-fields input {
+        width: 38px;
+        font-size: 12px;
+      }
+
+      .date-fields .year {
+        width: 56px;
+      }
+
+      .title-section h1 {
+        font-size: 22px;
+      }
+
+      .title-section p,
+      .meta-card label,
+      .field-card label,
+      .footer-box p {
+        font-size: 12px;
+      }
+
+      .total-row {
+        flex-wrap: wrap;
+      }
+
+      .total-row input {
+        width: 100%;
+        text-align: right;
       }
     }
   </style>

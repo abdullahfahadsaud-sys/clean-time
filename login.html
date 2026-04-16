@@ -11,9 +11,10 @@
   --text-muted:#8a9bbf; --white:#fff;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Cairo',sans-serif;background:var(--navy);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
-body::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(74,184,193,.13) 0%,transparent 70%);top:-150px;right:-150px;border-radius:50%;animation:pulse 6s ease-in-out infinite;}
-body::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(232,101,42,.09) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;animation:pulse 8s ease-in-out infinite reverse;}
+html,body{width:100%;max-width:100%;overflow-x:hidden;}
+body{font-family:'Cairo',sans-serif;background:var(--navy);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden;overflow-y:auto;position:relative;padding:24px 0;}
+body::before{content:'';position:absolute;width:min(600px,90vw);height:min(600px,90vw);background:radial-gradient(circle,rgba(74,184,193,.13) 0%,transparent 70%);top:-150px;right:max(-150px,-18vw);border-radius:50%;animation:pulse 6s ease-in-out infinite;}
+body::after{content:'';position:absolute;width:min(400px,72vw);height:min(400px,72vw);background:radial-gradient(circle,rgba(232,101,42,.09) 0%,transparent 70%);bottom:-100px;left:max(-100px,-14vw);border-radius:50%;animation:pulse 8s ease-in-out infinite reverse;}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.2);opacity:1;}}
 .circles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
 .circle{position:absolute;border-radius:50%;border:1px solid rgba(74,184,193,.1);}
@@ -21,13 +22,13 @@ body::after{content:'';position:absolute;width:400px;height:400px;background:rad
 .circle:nth-child(2){width:300px;height:300px;bottom:15%;right:8%;animation:rot 30s linear infinite reverse;border-color:rgba(232,101,42,.07);}
 .circle:nth-child(3){width:100px;height:100px;top:60%;left:15%;animation:rot 15s linear infinite;}
 @keyframes rot{to{transform:rotate(360deg);}}
-.wrap{position:relative;z-index:10;width:100%;max-width:430px;padding:20px;}
+.wrap{position:relative;z-index:10;width:100%;max-width:430px;padding:20px 16px;}
 .logo-sec{text-align:center;margin-bottom:34px;animation:fdown .8s ease both;}
 @keyframes fdown{from{opacity:0;transform:translateY(-24px);}to{opacity:1;transform:translateY(0);}}
 .logo-frame{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.98);padding:12px 16px;border-radius:26px;box-shadow:0 18px 45px rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.18);}
 .logo-img{width:210px;max-width:100%;height:auto;display:block;}
 .logo-note{font-size:13px;color:var(--teal);font-weight:700;margin-top:14px;}
-.card{background:rgba(255,255,255,.04);backdrop-filter:blur(18px);border:1px solid rgba(74,184,193,.15);border-radius:22px;padding:38px 34px;animation:fup .8s ease .2s both;}
+.card{background:rgba(255,255,255,.04);backdrop-filter:blur(18px);border:1px solid rgba(74,184,193,.15);border-radius:22px;padding:38px 34px;animation:fup .8s ease .2s both;max-width:100%;}
 @keyframes fup{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 .card-title{font-size:19px;font-weight:700;text-align:center;margin-bottom:5px;}
 .card-sub{font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:28px;}
@@ -46,6 +47,14 @@ body::after{content:'';position:absolute;width:400px;height:400px;background:rad
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-7px);}75%{transform:translateX(7px);}}
 .footer{text-align:center;color:var(--text-muted);font-size:11px;margin-top:22px;}
 .footer span{color:var(--teal);}
+@media (max-width:560px){
+  body{padding:18px 0;}
+  .wrap{padding:16px 14px;}
+  .logo-sec{margin-bottom:24px;}
+  .logo-frame{padding:10px 12px;border-radius:20px;max-width:100%;}
+  .logo-img{width:min(210px,100%);}
+  .card{padding:28px 20px;border-radius:18px;}
+}
 </style>
 </head>
 <body>
