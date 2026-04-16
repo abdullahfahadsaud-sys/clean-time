@@ -47,6 +47,7 @@ def sec_log(event: str, **kwargs: Any) -> None:
     parts = " ".join(f"{k}={v!r}" for k, v in kwargs.items())
     _sec_logger.info("event=%s %s", event, parts)
 
+
 CONTENT_TYPES = {
     ".css": "text/css; charset=utf-8",
     ".html": "text/html; charset=utf-8",
@@ -348,7 +349,6 @@ def clear_login_attempts(handler: BaseHTTPRequestHandler, username: str = "") ->
 
 
 def too_many_attempts(handler: BaseHTTPRequestHandler, username: str = "") -> tuple[bool, int]:
-    """Return (blocked, retry_after_seconds). Checks both IP and username."""
     ip = client_ip(handler)
     now = datetime.now()
     ip_cutoff = (now - timedelta(seconds=LOGIN_WINDOW_SECONDS)).isoformat()
@@ -468,7 +468,6 @@ def create_session(user_id: int) -> tuple[str, str]:
     csrf_token = secrets.token_urlsafe(24)
     expires_at = (now_local() + timedelta(hours=SESSION_TTL_HOURS)).isoformat(timespec="seconds")
     with get_db() as conn:
-        # Enforce concurrent session cap — keep newest (MAX_SESSIONS_PER_USER - 1), delete oldest
         old_ids = conn.execute(
             """
             SELECT id FROM sessions WHERE user_id = ?
@@ -1595,7 +1594,6 @@ class AppHandler(BaseHTTPRequestHandler):
     def handle_api_post(self, parsed: Any) -> None:
         path = parsed.path
         if path == "/api/auth/login":
-            # Early rate-limit check (IP only, before we know username)
             blocked, retry_after = too_many_attempts(self)
             if blocked:
                 self.send_json(
@@ -1613,7 +1611,6 @@ class AppHandler(BaseHTTPRequestHandler):
                 self.send_json({"error": "bad_request", "message": str(exc)}, status=HTTPStatus.BAD_REQUEST)
                 return
 
-            # Per-username rate-limit check
             blocked, retry_after = too_many_attempts(self, username)
             if blocked:
                 self.send_json(
@@ -1831,7 +1828,7 @@ def parse_args() -> argparse.Namespace:
     sub = parser.add_subparsers(dest="command")
 
     run = sub.add_parser("runserver", help="Run the local web server")
-    run.add_argument("--host", default="127.0.0.1")
+    run.add_argument("--host", default="0.0.0.0")
     run.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8000)))
     run.add_argument("--bootstrap-demo-users", action="store_true")
 
@@ -1900,7 +1897,11 @@ def main() -> int:
 
     if args.command in (None, "runserver"):
         if args.command is None:
-            args = argparse.Namespace(host="127.0.0.1", port=8000, bootstrap_demo_users=True)
+            args = argparse.Namespace(
+                host="0.0.0.0",
+                port=int(os.environ.get("PORT", 8000)),
+                bootstrap_demo_users=True,
+            )
         return cmd_runserver(args)
     if args.command == "create-user":
         return cmd_create_user(args)
