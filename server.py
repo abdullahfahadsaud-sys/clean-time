@@ -101,11 +101,11 @@ SERVICES = {
 }
 
 TEAM_NAMES = {
-    "team1": "الفريق الأول",
-    "team2": "الفريق الثاني",
-    "team3": "الفريق الثالث",
-    "team4": "الفريق الرابع",
-    "team5": "الفريق الخامس",
+    "asl": "اسلام",
+    "omr": "عمران",
+    "saf": "سيف",
+    "team4": "فارغ",
+    "team5": "فارغ",
 }
 
 PAYMENT_METHODS = {"كاش", "شبكة", "تحويل", "مختلط"}
@@ -1803,22 +1803,29 @@ def random_password(length: int = 20) -> str:
     return "".join(secrets.choice(alphabet) for _ in range(length))
 
 
-def ensure_demo_users() -> None:
+def ensure_default_users() -> None:
     with get_db() as conn:
         count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     if count:
         return
-    admin_password = random_password()
-    team_password = random_password()
-    create_user("admin", admin_password, "admin", "مدير النظام")
-    create_user("team1", team_password, "team", "الفريق الأول")
-    credentials = (
-        "\nتم إنشاء حسابات أولية آمنة:\n"
-        f"admin / {admin_password}\n"
-        f"team1 / {team_password}\n"
-        "أنشئ أو غيّر الحسابات فورًا عبر أوامر create-user و reset-password.\n"
+    default_users = [
+        {"display_name": "عبدالله", "username": "abo", "password": "Aa112233", "role": "admin"},
+        {"display_name": "ابو ادم", "username": "mho", "password": "Aa112233", "role": "admin"},
+        {"display_name": "admin", "username": "admin", "password": "Aa112233", "role": "admin"},
+        {"display_name": "اسلام", "username": "asl", "password": "Aa123123", "role": "team"},
+        {"display_name": "عمران", "username": "omr", "password": "Aa123456", "role": "team"},
+        {"display_name": "سيف", "username": "saf", "password": "Aa11223344", "role": "team"},
+        {"display_name": "فارغ", "username": "team4", "password": "team4", "role": "team"},
+        {"display_name": "فارغ", "username": "team5", "password": "team5", "role": "team"},
+    ]
+
+    for user in default_users:
+        create_user(user["username"], user["password"], user["role"], user["display_name"])
+
+    created_accounts = "\n".join(
+        f"- {user['display_name']} | {user['username']} | {user['role']}" for user in default_users
     )
-    sys.stderr.write(credentials)
+    sys.stderr.write(f"\nتم إنشاء الحسابات الافتراضية التالية:\n{created_accounts}\n")
 
 
 def parse_args() -> argparse.Namespace:
@@ -1828,7 +1835,6 @@ def parse_args() -> argparse.Namespace:
     run = sub.add_parser("runserver", help="Run the local web server")
     run.add_argument("--host", default="0.0.0.0")
     run.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8000)))
-    run.add_argument("--bootstrap-demo-users", action="store_true")
 
     create = sub.add_parser("create-user", help="Create a new user")
     create.add_argument("--username", required=True)
@@ -1876,8 +1882,7 @@ def cmd_list_users() -> int:
 
 def cmd_runserver(args: argparse.Namespace) -> int:
     init_db()
-    if args.bootstrap_demo_users:
-        ensure_demo_users()
+    ensure_default_users()
     server = ThreadingHTTPServer((args.host, args.port), AppHandler)
     print(f"Clean Time server running on http://{args.host}:{args.port}")
     try:
@@ -1898,7 +1903,6 @@ def main() -> int:
             args = argparse.Namespace(
                 host="0.0.0.0",
                 port=int(os.environ.get("PORT", 8000)),
-                bootstrap_demo_users=True,
             )
         return cmd_runserver(args)
     if args.command == "create-user":
