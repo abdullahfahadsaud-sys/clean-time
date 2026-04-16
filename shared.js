@@ -483,8 +483,11 @@
     };
   }
 
-  function buildInvoiceHtml(order) {
+  async function buildInvoiceHtml(order) {
     const view = buildInvoiceViewModel(order);
+    const [logoDataUrl, stampDataUrl] = await Promise.all([getLogoDataUrl(), getStampDataUrl()]);
+    const logoSrc = logoDataUrl || view.logoUrl;
+    const stampSrc = stampDataUrl || view.stampUrl;
     const rowsMarkup = view.rows
       .map(
         (row) => `
@@ -682,7 +685,7 @@
             content: "";
             position: absolute;
             inset: 80px 40px 80px 40px;
-            background: url("${escapeHtml(view.logoUrl)}") center/42% no-repeat;
+            background: url("${escapeHtml(logoSrc)}") center/42% no-repeat;
             opacity: 0.035;
             pointer-events: none;
           }
@@ -842,7 +845,7 @@
 
               <div class="logo-wrap">
                 <div class="logo-frame">
-                  <img id="invoiceLogo" class="logo" src="${escapeHtml(view.logoUrl)}" alt="Clean Time Logo">
+                  <img id="invoiceLogo" class="logo" src="${escapeHtml(logoSrc)}" alt="Clean Time Logo">
                 </div>
                 <div class="invoice-title">فاتورة</div>
                 <div class="invoice-subtitle">Clean Time Invoice</div>
@@ -898,7 +901,7 @@
               <div class="signature-panel">
                 <div>
                   <img
-                    src="${escapeHtml(view.stampUrl)}"
+                    src="${escapeHtml(stampSrc)}"
                     alt="شعار المؤسسة"
                     onerror="this.closest('.signature-panel').style.display='none';"
                   >
@@ -930,9 +933,27 @@
         </div>
 
         <script>
+          function waitForInvoiceImages() {
+            const images = Array.from(document.images).filter((img) => img.getAttribute("src"));
+            return Promise.all(
+              images.map((img) => {
+                if (img.complete) return Promise.resolve();
+                return new Promise((resolve) => {
+                  const done = () => resolve();
+                  img.addEventListener("load", done, { once: true });
+                  img.addEventListener("error", done, { once: true });
+                });
+              })
+            );
+          }
+
           window.addEventListener("load", () => {
-            window.focus();
-            setTimeout(() => window.print(), 250);
+            waitForInvoiceImages().finally(() => {
+              window.focus();
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => window.print());
+              });
+            });
           }, { once: true });
         <\/script>
       </body>
@@ -1265,7 +1286,65 @@
     return { shared: false, filename };
   }
 
-  function printInvoice(order) {
+  function buildPrintLoadingHtml(order) {
+    const invoiceNumber = escapeHtml(order?.invoiceNumber || "—");
+    return `
+      <!DOCTYPE html>
+      <html lang="ar" dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <title>تجهيز الفاتورة ${invoiceNumber}</title>
+        <style>
+          html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f4f7fb;
+            color: #17335c;
+          }
+
+          body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+          }
+
+          .loading-card {
+            width: min(420px, 100%);
+            background: #fff;
+            border: 1px solid #d9e3ef;
+            border-radius: 18px;
+            box-shadow: 0 18px 40px rgba(17, 34, 68, 0.12);
+            padding: 28px 24px;
+            text-align: center;
+          }
+
+          .loading-card strong {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 8px;
+          }
+
+          .loading-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #6b7f99;
+            line-height: 1.8;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="loading-card">
+          <strong>جار تجهيز الفاتورة للطباعة</strong>
+          <p>رقم الفاتورة: ${invoiceNumber}</p>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  async function printInvoice(order) {
     const win = window.open("", "_blank");
 
     if (!win) {
@@ -1274,8 +1353,22 @@
     }
 
     win.document.open();
-    win.document.write(buildInvoiceHtml(order));
+    win.document.write(buildPrintLoadingHtml(order));
     win.document.close();
+
+    try {
+      const invoiceHtml = await buildInvoiceHtml(order);
+      if (win.closed) return;
+      win.document.open();
+      win.document.write(invoiceHtml);
+      win.document.close();
+    } catch (error) {
+      if (!win.closed) {
+        win.close();
+      }
+      console.error("Failed to prepare invoice for printing:", error);
+      window.alert("تعذر تجهيز الفاتورة للطباعة. حاول مرة أخرى.");
+    }
   }
 
   function playSuccessSound() {
