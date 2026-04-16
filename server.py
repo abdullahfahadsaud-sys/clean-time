@@ -1355,10 +1355,8 @@ class AppHandler(BaseHTTPRequestHandler):
             return
         if path.startswith("/static/"):
             static_target = path.lstrip("/")
-            suffix = Path(static_target).suffix.lower()
-            if suffix in CONTENT_TYPES:
-                self.serve_file(static_target)
-                return
+            self.serve_file(static_target)
+            return
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def handle_api_get(self, parsed: Any) -> None:
