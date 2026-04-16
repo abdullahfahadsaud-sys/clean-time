@@ -1832,7 +1832,7 @@ def parse_args() -> argparse.Namespace:
 
     run = sub.add_parser("runserver", help="Run the local web server")
     run.add_argument("--host", default="127.0.0.1")
-    run.add_argument("--port", type=int, default=8000)
+    run.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8000)))
     run.add_argument("--bootstrap-demo-users", action="store_true")
 
     create = sub.add_parser("create-user", help="Create a new user")
