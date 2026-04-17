@@ -23,6 +23,7 @@ from urllib.parse import parse_qs, urlparse
 BASE_DIR = Path(__file__).resolve().parent
 _db_env = os.getenv("CT_DB_PATH", "")
 DB_PATH = Path(_db_env).resolve() if _db_env else BASE_DIR / "clean_time.db"
+print(f"[DEBUG] Using database path: {DB_PATH}")
 SESSION_COOKIE = "ct_session"
 SESSION_TTL_HOURS = 12
 MAX_BODY_SIZE = 64 * 1024
