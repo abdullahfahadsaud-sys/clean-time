@@ -23,7 +23,8 @@ from urllib.parse import parse_qs, urlparse
 BASE_DIR = Path(__file__).resolve().parent
 _db_env = os.getenv("CT_DB_PATH", "")
 DB_PATH = Path(_db_env).resolve() if _db_env else BASE_DIR / "clean_time.db"
-print(f"[DEBUG] Using database path: {DB_PATH}")
+sys.stderr.write(f"[DEBUG] Using database path: {DB_PATH}\n")
+sys.stderr.write(f"[DEBUG] DB file exists before init: {DB_PATH.exists()}\n")
 SESSION_COOKIE = "ct_session"
 SESSION_TTL_HOURS = 12
 MAX_BODY_SIZE = 64 * 1024
@@ -1883,6 +1884,14 @@ def cmd_list_users() -> int:
 
 def cmd_runserver(args: argparse.Namespace) -> int:
     init_db()
+
+    with get_db() as conn:
+        user_count_before = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        order_count_before = conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
+
+    sys.stderr.write(f"[DEBUG] Users before defaults: {user_count_before}\n")
+    sys.stderr.write(f"[DEBUG] Orders before start: {order_count_before}\n")
+
     ensure_default_users()
     server = ThreadingHTTPServer((args.host, args.port), AppHandler)
     print(f"Clean Time server running on http://{args.host}:{args.port}")
